@@ -160,7 +160,7 @@ cython_debug/
 #.idea/
 
 .gitignore
-app2.py
+app*.py
 main.py
 yolov5m.pt
 yolov5s.pt
