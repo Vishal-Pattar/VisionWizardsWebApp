@@ -162,7 +162,4 @@ cython_debug/
 .gitignore
 app*.py
 main.py
-yolov5m.pt
-yolov5s.pt
 *.pth
-*.avi
