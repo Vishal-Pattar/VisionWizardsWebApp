@@ -12,14 +12,23 @@ class Notification:
         load_dotenv()
         self.filename = "Output/fallen_frame.jpg"
         self.webhook_url = os.getenv("API_KEY")
+        
+        if self.beep:
+            self.frequency = 2500
+            self.duration = 0.5
+            self.sample_rate = 44100
+            self.t = np.linspace(0, self.duration, int(self.sample_rate * self.duration), endpoint=False)
+            self.samples = (np.sin(2 * np.pi * self.frequency * self.t)).astype(np.float32)
+            self.p = pyaudio.PyAudio()
+            self.stream = self.p.open(format=pyaudio.paFloat32, channels=1, rate=self.sample_rate, output=True)
     
     def notify(self, modified_frame, flagFall):
         if flagFall and self.beep:
-            self.beep_sound()
+            self.play_beep()
         
         if flagFall and self.alert:
             self.send_webhook(modified_frame)
-            
+    
     def send_webhook(self, frame):
         cv2.imwrite(self.filename, frame)
         with open(self.filename, "rb") as f:
@@ -27,18 +36,12 @@ class Notification:
             requests.post(self.webhook_url, files=files)
         if os.path.exists(self.filename):
             os.remove(self.filename)
-            
-    def beep_sound(self):
-        frequency = 2500  # Frequency of the beep (Hz)
-        duration = 0.5    # Duration of the beep (seconds)
-        sample_rate = 44100  # Sampling rate (samples per second)
-
-        t = np.linspace(0, duration, int(sample_rate * duration), endpoint=False)
-        samples = (np.sin(2 * np.pi * frequency * t)).astype(np.float32)
-
-        p = pyaudio.PyAudio()
-        stream = p.open(format=pyaudio.paFloat32, channels=1, rate=sample_rate, output=True)
-        stream.write(samples.tobytes())
-        stream.stop_stream()
-        stream.close()
-        p.terminate()
+    
+    def play_beep(self):
+        self.stream.write(self.samples.tobytes())
+    
+    def __del__(self):
+        if self.beep:
+            self.stream.stop_stream()
+            self.stream.close()
+            self.p.terminate()
