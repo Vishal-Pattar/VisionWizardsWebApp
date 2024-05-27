@@ -1,8 +1,9 @@
 import os
 import cv2
-import winsound
 import requests
 from dotenv import load_dotenv
+import numpy as np
+import pyaudio
 
 class Notification:
     def __init__(self, beep=False, alert=False):
@@ -28,4 +29,16 @@ class Notification:
             os.remove(self.filename)
             
     def beep_sound(self):
-        winsound.Beep(2500, 500)
+        frequency = 2500  # Frequency of the beep (Hz)
+        duration = 0.5    # Duration of the beep (seconds)
+        sample_rate = 44100  # Sampling rate (samples per second)
+
+        t = np.linspace(0, duration, int(sample_rate * duration), endpoint=False)
+        samples = (np.sin(2 * np.pi * frequency * t)).astype(np.float32)
+
+        p = pyaudio.PyAudio()
+        stream = p.open(format=pyaudio.paFloat32, channels=1, rate=sample_rate, output=True)
+        stream.write(samples.tobytes())
+        stream.stop_stream()
+        stream.close()
+        p.terminate()
