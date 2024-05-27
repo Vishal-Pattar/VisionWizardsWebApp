@@ -61,11 +61,20 @@ elif st.session_state.page == "Admin Panel":
         placeholder = st.empty()  # Placeholder for the live stream
 
         if st.button("Start"):
-            st.session_state.stream_manager = StreamManager()
+            st.session_state.stream_manager = StreamManager(
+                video_path='./sample_videos/FallOnEscalator.avi',
+                model_name=st.session_state.model_name,
+                confidence_score=st.session_state.confidence_score,
+                color_thresholds=st.session_state.color_thresholds,
+                model_type=st.session_state.model_type,
+                frames_to_skip=st.session_state.frames_to_skip,
+                beep_enabled=st.session_state.beep_enabled,
+                alert_enabled=st.session_state.alert_enabled
+            )
             st.session_state.stream_manager.start_streaming()
 
-        if st.button("Pause"):
-            if st.session_state.stream_manager:
+        if st.session_state.stream_manager and st.session_state.stream_manager.is_streaming:
+            if st.button("Pause" if not st.session_state.stream_manager.is_paused else "Resume"):
                 st.session_state.stream_manager.pause_streaming()
 
         if st.button("Stop"):
@@ -73,11 +82,7 @@ elif st.session_state.page == "Admin Panel":
                 st.session_state.stream_manager.stop_streaming()
 
         if st.session_state.stream_manager and st.session_state.stream_manager.is_streaming:
-            for frame in capture_camera():
-                if st.session_state.stream_manager.is_paused:
-                    continue
-                # Convert the OpenCV frame to PIL image
-                frame = st.session_state.stream_manager.process_frame(frame)
-                pil_img = Image.fromarray(frame)
-                # Update the placeholder with the new frame
-                placeholder.image(pil_img, caption="Live Stream", width=1000)
+            for frame in capture_camera(st.session_state.stream_manager):
+                if frame is not None:
+                    pil_img = Image.fromarray(frame)
+                    placeholder.image(pil_img, caption="Live Stream", width=1000)

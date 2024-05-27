@@ -1,65 +1,49 @@
-import streamlit as st
 import cv2
 from person_detector import PersonDetector
 from video_stream import VideoStream
 from notification_system import Notification
 
-DEFAULT_VIDEO_PATH = './sample_videos/FallOnEscalator.avi'
-
-def capture_camera():
-    """
-    Generator function to capture frames from the video stream.
-    """
-    while True:
-        if st.session_state.video_stream is None or st.session_state.person_detector is None or st.session_state.notification_system is None:
-            break
-        success, frame = st.session_state.video_stream.read_frame()
-        if not success:
-            break
-        results, flag_fall = st.session_state.person_detector.detect_person(frame)
-        modified_frame = st.session_state.person_detector.draw_boxes(frame, results)
-        st.session_state.notification_system.notify(modified_frame, flag_fall)
-        yield modified_frame
-
 class StreamManager:
-    def __init__(self):
+    def __init__(self, video_path, model_name, confidence_score, color_thresholds, model_type, frames_to_skip, beep_enabled, alert_enabled):
+        self.person_detector = PersonDetector(model_name, confidence_score, color_thresholds, model_type)
+        self.video_stream = VideoStream(video_path, frames_to_skip)
+        self.notification_system = Notification(beep=beep_enabled, alert=alert_enabled)
         self.is_streaming = False
         self.is_paused = False
+        self.current_frame = None
 
     def start_streaming(self):
-        """
-        Start the video streaming process.
-        """
-        st.session_state.person_detector = PersonDetector(st.session_state.model_name, st.session_state.confidence_score, st.session_state.color_thresholds, st.session_state.model_type)
-        st.session_state.video_stream = VideoStream(DEFAULT_VIDEO_PATH, st.session_state.frames_to_skip)
-        st.session_state.notification_system = Notification(beep=st.session_state.beep_enabled, alert=st.session_state.alert_enabled)
-        st.session_state.notification_system.beep_sound()
         self.is_streaming = True
         self.is_paused = False
 
     def pause_streaming(self):
-        """
-        Pause or resume the video streaming process.
-        """
         self.is_paused = not self.is_paused
 
     def stop_streaming(self):
-        """
-        Stop the video streaming process.
-        """
-        st.session_state.person_detector = None
-        st.session_state.video_stream = None
-        st.session_state.notification_system = None
         self.is_streaming = False
         self.is_paused = False
+        self.person_detector = None
+        self.video_stream = None
+        self.notification_system = None
 
-    def process_frame(self, frame):
-        """
-        Process a frame for display.
+    def read_frame(self):
+        success, frame = self.video_stream.read_frame()
+        if success:
+            results, flag_fall = self.person_detector.detect_person(frame)
+            self.current_frame = self.person_detector.draw_boxes(frame, results)
+            self.notification_system.notify(self.current_frame, flag_fall)
+        return success
 
-        :param frame: The frame to process
-        :return: Processed frame
-        """
-        # Convert the OpenCV frame to RGB
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        return frame
+    def process_frame(self):
+        if self.current_frame is not None:
+            frame = cv2.cvtColor(self.current_frame, cv2.COLOR_BGR2RGB)
+            return frame
+        return None
+
+def capture_camera(stream_manager):
+    while stream_manager.is_streaming:
+        if not stream_manager.is_paused:
+            success = stream_manager.read_frame()
+            if not success:
+                break
+        yield stream_manager.process_frame()
