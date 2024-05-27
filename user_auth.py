@@ -1,3 +1,15 @@
+import json
+
+def load_users():
+    """
+    Load users from the JSON file.
+
+    :return: List of users
+    """
+    with open('users.json', 'r') as file:
+        users = json.load(file)
+    return users
+
 def login_user(email, password):
     """
     Function to handle user login.
@@ -6,5 +18,8 @@ def login_user(email, password):
     :param password: User's password
     :return: Boolean indicating whether login is successful
     """
-    # In a real application, add authentication logic here
-    return email == "admin@mahametro.com" and password == "admin123"
+    users = load_users()
+    for user in users:
+        if user["email"] == email and user["password"] == password:
+            return True
+    return False

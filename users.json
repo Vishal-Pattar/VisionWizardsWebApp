@@ -1,0 +1,14 @@
+[
+    {
+        "email": "admin@mahametro.com",
+        "password": "admin123"
+    },
+    {
+        "email": "vishal@gmail.com",
+        "password": "vishal"
+    },
+    {
+        "email": "abc@gmail.com",
+        "password": "abc"
+    }
+]
