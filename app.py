@@ -62,7 +62,7 @@ elif st.session_state.page == "Admin Panel":
 
         if st.button("Start"):
             st.session_state.stream_manager = StreamManager(
-                video_path='./sample_videos/FallOnEscalator.avi',
+                video_path=st.session_state.video_path,
                 model_name=st.session_state.model_name,
                 confidence_score=st.session_state.confidence_score,
                 color_thresholds=st.session_state.color_thresholds,

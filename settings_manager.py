@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 
 DEFAULT_MODEL_NAME = "YOLOv5"
 DEFAULT_MODEL_TYPE = 'n'
@@ -7,6 +8,8 @@ DEFAULT_COLOR_THRESHOLDS = [1.65, 1.30, 0.70]
 DEFAULT_FRAMES_TO_SKIP = 9
 DEFAULT_BEEP_ENABLED = True
 DEFAULT_ALERT_ENABLED = False
+DEFAULT_VIDEO_FILE = "sample1.mp4"
+DEFAULT_VIDEO_PATH = "sample_videos"
 
 class SettingsManager:
     def __init__(self):
@@ -23,11 +26,29 @@ class SettingsManager:
         st.session_state.frames_to_skip = DEFAULT_FRAMES_TO_SKIP
         st.session_state.beep_enabled = DEFAULT_BEEP_ENABLED
         st.session_state.alert_enabled = DEFAULT_ALERT_ENABLED
+        st.session_state.video_file = DEFAULT_VIDEO_FILE
+        st.session_state.video_path = DEFAULT_VIDEO_PATH
 
     def display_settings(self):
         """
         Display the settings page in the Streamlit app.
         """
+        st.subheader("Video File")
+        option = st.radio("Choose Option:", ("Select from options", "Upload file"))
+
+        if option == "Select from options":
+            video_files = os.listdir("sample_videos")
+            st.session_state.video_file = st.selectbox("Video File", video_files)
+            st.session_state.video_path = os.path.join("sample_videos", st.session_state.video_file)
+        else:
+            uploaded_file = st.file_uploader("Upload Video File", type=["mp4", "avi"])
+            if uploaded_file is not None:
+                st.session_state.video_file = uploaded_file.name
+                st.session_state.video_path = os.path.join("uploads", st.session_state.video_file)
+                with open(st.session_state.video_path, "wb") as f:
+                    f.write(uploaded_file.getvalue())
+
+                
         st.subheader("Model Configuration")
         st.session_state.model_name = st.selectbox("Model Name", ["YOLOv5", "FasterCNN"], index=["YOLOv5", "FasterCNN"].index(st.session_state.model_name))
         st.session_state.model_type = st.selectbox("Model Type", ['n', 's', 'm', 'l', 'x'], index=['n', 's', 'm', 'l', 'x'].index(st.session_state.model_type))
