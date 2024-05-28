@@ -73,4 +73,8 @@ Check out our live demo [here](https://visionwizardswebapp.onrender.com).
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Contributors
-- [Vishal Pattar](https://github.com/Vishal-Pattar).
+- [Vishal Pattar](https://github.com/Vishal-Pattar)
+- [Dhanashri Mirajkar](https://github.com/MirajkarD)
+- [Bhaskar Dhuri](https://github.com/bhaskardhuri)
+- [Tanaya Varpe](https://github.com/TanayaVarpe22)
+- [Gauri Raykar](https://github.com/Gauri24R)
