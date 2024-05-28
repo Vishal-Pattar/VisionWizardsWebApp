@@ -1,13 +1,14 @@
 # Vision Wizards Web App
 
-VisionWizardsWebApp is a web application designed to demonstrate advanced computer vision capabilities. The application provides functionalities such as person detection, video streaming, and user authentication.
+## Overview
+
+VisionWizardsWebApp is designed to provide real-time analytics for detecting passenger falls on escalators using a dedicated CCTV camera. The system identifies fall incidents and triggers alerts to prevent accidents or train overruns.
 
 ## Features
 
-- **Person Detection:** Real-time detection of people in video streams.
-- **Video Streaming:** Stream video from different sources with integrated person detection.
-- **User Authentication:** Secure login and user management.
-- **Notification System:** Get notifications based on detection events.
+- **Real-time Fall Detection**: Monitors escalator footage to identify passenger falls.
+- **Alert System**: Sends immediate alerts to relevant personnel to avert potential accidents.
+- **Analytics Dashboard**: Displays fall statistics and trends for further analysis.
 
 ## Getting Started
 
